@@ -17,15 +17,15 @@ install(
   DESTINATION share/${PROJECT_NAME}/worlds
 )
 
-get_filename_component(PGW_PREFIX
-  "${pal_gazebo_worlds_DIR}/../../.." ABSOLUTE)
+#get_filename_component(PGW_PREFIX
+  #"${pal_gazebo_worlds_DIR}/../../.." ABSOLUTE)
 
-file(GLOB SAHRI_WORLDS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/worlds/*.world")
+#file(GLOB SAHRI_WORLDS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/worlds/*.world")
 
-if(SAHRI_WORLDS)
-  install(FILES ${SAHRI_WORLDS}
-          DESTINATION "${PGW_PREFIX}/share/pal_gazebo_worlds/worlds")
-endif()
+#if(SAHRI_WORLDS)
+  #install(FILES ${SAHRI_WORLDS}
+          #DESTINATION "${PGW_PREFIX}/share/pal_gazebo_worlds/worlds")
+#endif()
 
 # Following directives are used when testing.
 if(BUILD_TESTING)
