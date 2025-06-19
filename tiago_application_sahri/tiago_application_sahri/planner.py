@@ -8,9 +8,9 @@ class PosePublisher(Node):
         super().__init__('pose_publisher')
         self.publisher_ = self.create_publisher(Pose, '/target_pose', 10)
         self.pose = Pose()
-        self.pose.position.x = 0.0
+        self.pose.position.x = 0.4
         self.pose.position.y = 0.0
-        self.pose.position.z = 0.1
+        self.pose.position.z = 0.45
         self.pose.orientation.x = 0.0
         self.pose.orientation.y = 0.0
         self.pose.orientation.z = 0.0
