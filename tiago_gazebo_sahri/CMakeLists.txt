@@ -4,7 +4,10 @@ cmake_minimum_required(VERSION 3.5)
 project(tiago_gazebo_sahri)
 
 
-#
+# Following directives find required packages and load their configuration.
+# The 'set' directive defines a variable (e.g. 'GZ_PLUGIN_VER').
+# Such variables can be used lateron in the CMakeLists.txt file.
+find_package(ament_cmake REQUIRED)
 find_package(tiago_simulation REQUIRED)
 find_package(pal_gazebo_worlds REQUIRED)
 
