@@ -18,7 +18,8 @@ setup(
     description='TODO: Package description',
     license='TODO: License declaration',
     entry_points={
-        'console_scripts': [
-        ],
+            'console_scripts': [
+                    'planner = tiago_application_sahri.planner:main',
+            ],
     },
 )
