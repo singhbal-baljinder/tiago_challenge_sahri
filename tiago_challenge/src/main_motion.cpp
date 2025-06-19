@@ -41,6 +41,20 @@ void target_pose_callback(
   }
 }
 
+// Callback for gripper command subscription
+void gripper_cmd_callback(
+  const std_msgs::msg::String::SharedPtr msg,
+  std::shared_ptr<icr_Motionplanning_arms> node)
+{
+  RCLCPP_INFO(node->get_logger(), "Received gripper command: '%s'", msg->data.c_str());
+  try {
+    node->GripperControl(msg->data);
+    RCLCPP_INFO(node->get_logger(), "Gripper command executed.");
+  } catch (const std::exception & e) {
+    RCLCPP_ERROR(node->get_logger(), "Gripper command failed: %s", e.what());
+  }
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
@@ -73,7 +87,8 @@ int main(int argc, char ** argv)
   obstacle_pose.pose.orientation.w = 1.0;
   moveit_msgs::msg::PlanningScene planning_scene_msg =
     node->Add_Obstacle(obstacle_pose, "Table");
-  // planning_scene_publisher_->publish(planning_scene_msg);
+    
+  planning_scene_publisher_->publish(planning_scene_msg);
 
   // Create a subscription to the target pose topic using the dedicated callback
   auto pose_sub = node->create_subscription<geometry_msgs::msg::Pose>(
@@ -81,6 +96,13 @@ int main(int argc, char ** argv)
     [node](const geometry_msgs::msg::Pose::SharedPtr msg) {
       target_pose_callback(msg, node);
     });
+
+    // Create a subscription to the gripper command topic
+  auto gripper_cmd_sub = node->create_subscription<std_msgs::msg::String>(
+    "/gripper_cmd", 10,
+    [node](const std_msgs::msg::String::SharedPtr msg) {
+      gripper_cmd_callback(msg, node);
+  });
 
   // Spin to process callbacks
   rclcpp::spin(node);
