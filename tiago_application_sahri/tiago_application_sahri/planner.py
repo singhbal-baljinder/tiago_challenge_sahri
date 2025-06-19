@@ -22,6 +22,7 @@ class PosePublisher(Node):
         self.publisher_.publish(self.pose)
         self.get_logger().info('Publishing constant target pose')
 
+
 def main(args=None):
     rclpy.init(args=args)
     node = PosePublisher()
