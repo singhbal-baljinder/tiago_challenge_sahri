@@ -188,11 +188,11 @@ void icr_Motionplanning_arms::SendGripperAction(
 
   if (command == "OPEN") {
     for (size_t i = 0; i < joint_names.size(); ++i) {
-      goal.trajectory.points[0].positions[i] = 0.04;  // example open pos
+      goal.trajectory.points[0].positions[i] = 0.01;  // example open pos
     }
   } else if (command == "CLOSE") {
     for (size_t i = 0; i < joint_names.size(); ++i) {
-      goal.trajectory.points[0].positions[i] = 0.01;  // example close pos
+      goal.trajectory.points[0].positions[i] = 0.00;  // example close pos
     }
   } else {
     RCLCPP_ERROR(this->get_logger(), "Unknown gripper command: %s", command.c_str());

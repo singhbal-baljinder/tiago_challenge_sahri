@@ -40,7 +40,7 @@ from gazebo_msgs.msg import EntityState
 # ---------------------------------------------------------------------------
 # Paramètres scène
 # ---------------------------------------------------------------------------
-TABLE_Z   = 0.68 + 0.21            # hauteur table (surface) + marge
+TABLE_Z   = 0.53 + 0.27            # hauteur table (surface) + marge
 BLOCK_H   = 0.015                  # épaisseur du bloc
 CENTER_Z  = TABLE_Z + BLOCK_H / 2.0      # 0.6875 m
 SAFE_Z    = 1.05                        # zone sûre bien au-dessus
@@ -64,7 +64,6 @@ Q_ROLL            = Q_DOWN_X_NEG90   # garde la pince vers le bas chez TIAGo
 # Bloc à suivre
 BLOCK_NAME      = 'jenga_block'
 BLOCK_OFFSET    = (0.0, 0.0, -BLOCK_H/2)  # centre bloc ↘ pinces
-SET_STATE_SERVICE = '/gazebo/set_entity_state'  # peut changer sous Ignition
 # ---------------------------------------------------------------------------
 
 def make_pose(x: float, y: float, z: float, q=Q_DOWN) -> Pose:
@@ -84,10 +83,6 @@ class PickPlace(Node):
         self.pose_pub = self.create_publisher(Pose,   '/target_pose',  10)
         self.grip_pub = self.create_publisher(String, '/gripper_cmd',  10)
 
-        # Service client SetEntityState (téléportation)
-        self.set_state_cli = self.create_client(SetEntityState, SET_STATE_SERVICE)
-        if not self.set_state_cli.wait_for_service(timeout_sec=5.0):
-            self.get_logger().error('Service SetEntityState indisponible !')
         self.follow = False  # bloc attaché virtuellement ?
 
         # (pose | None, 'OPEN'/'CLOSE', durée en secondes)
@@ -127,27 +122,6 @@ class PickPlace(Node):
         self.create_timer(1.0 / FREQ_HZ, self.timer_cb)
 
     # ------------------------------------------------------------------
-    # Téléporte bloc pour qu’il colle à l’outil
-    # ------------------------------------------------------------------
-    def teleport_block(self, pose: Pose):
-        if not self.follow:
-            return
-        st = EntityState()
-        st.name = BLOCK_NAME
-        st.pose.position.x = pose.position.x + BLOCK_OFFSET[0]
-        st.pose.position.y = pose.position.y + BLOCK_OFFSET[1]
-        st.pose.position.z = pose.position.z + BLOCK_OFFSET[2]
-        st.pose.orientation = Quaternion(
-            x=pose.orientation.x,
-            y=pose.orientation.y,
-            z=pose.orientation.z,
-            w=pose.orientation.w,
-        )
-        req = SetEntityState.Request()
-        req.state = st
-        self.set_state_cli.call_async(req)  # non bloquant
-
-    # ------------------------------------------------------------------
     # Timer principal
     # ------------------------------------------------------------------
     def timer_cb(self):
@@ -170,7 +144,6 @@ class PickPlace(Node):
         # Publie la pose cible pour le bras
         if pose is not None:
             self.pose_pub.publish(pose)
-            self.teleport_block(pose)
 
         # ➜ Maintien gripper cmd à chaque tick
         self.grip_pub.publish(String(data=cmd))
