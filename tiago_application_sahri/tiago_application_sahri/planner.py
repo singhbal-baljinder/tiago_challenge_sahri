@@ -8,29 +8,36 @@ class PosePublisher(Node):
         super().__init__('pose_publisher')
         self.publisher_ = self.create_publisher(Pose, '/target_pose', 10)
         self.pose = Pose()
-        self.pose.position.x = 0.4
+        self.distance_x_base = 0.4
+        self.pose.position.x = self.distance_x_base
         self.pose.position.y = 0.0
         self.pose.position.z = 1.2
         self.pose.orientation.x = 0.0
-        self.pose.orientation.y = -np.pi / 2
+        self.pose.orientation.y = 0.707
         self.pose.orientation.z = 0.0
-        self.pose.orientation.w = 1.0
+        self.pose.orientation.w = 0.707
         self.action_counter = 0
         self.jenga_width = 0.025
         self.jenga_length = 0.075
         self.jenga_thickness = 0.015
-        self.table_height = 0.45
-        self.home = [0.4, 0.0, 1.]
+        self.table_height = 1.0
+        self.home = [self.distance_x_base, 0., 1.2]
         self.jenga_tower_z_displacement = -self.jenga_thickness
         self.list_positions = [
             self.home,
-            [0.4, 0.],
+            [self.distance_x_base, 0.],
             self.home,
-            [0.4 + self.jenga_width * 2, 0.],
+            [self.distance_x_base + self.jenga_width * 2, 0.],
             self.home,
-            [0.4 + self.jenga_width,  - self.jenga_length/2 + self.jenga_width/2],
+            [
+                self.distance_x_base + self.jenga_width,
+                -self.jenga_length/2 + self.jenga_width/2
+            ],
             self.home,
-            [0.4 + self.jenga_width, self.jenga_length/2 - self.jenga_width/2],
+            [
+                self.distance_x_base + self.jenga_width,
+                self.jenga_length/2 - self.jenga_width/2
+            ],
         ]
 
         # Initialize pose list and current index
@@ -43,11 +50,10 @@ class PosePublisher(Node):
         if current_cmd_index % 4 == 1:
             self.jenga_tower_z_displacement += self.jenga_thickness
         if current_cmd_index % 2 == 0:
-            self.pose.position.z = pos[2]
+            self.pose.position.z = pos[2]  # this is actually also home position
         else:
             self.pose.position.z = self.table_height + self.jenga_tower_z_displacement
         self.pose.position.x = pos[0]
-        self.pose.position.y = pos[1]
         self.pose.position.y = pos[1]
 
         # Publish the current pose
