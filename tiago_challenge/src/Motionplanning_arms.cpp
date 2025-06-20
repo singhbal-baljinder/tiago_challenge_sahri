@@ -188,7 +188,7 @@ void icr_Motionplanning_arms::SendGripperAction(
 
   if (command == "OPEN") {
     for (size_t i = 0; i < joint_names.size(); ++i) {
-      goal.trajectory.points[0].positions[i] = 0.01;  // example open pos
+      goal.trajectory.points[0].positions[i] = 0.02;  // example open pos
     }
   } else if (command == "CLOSE") {
     for (size_t i = 0; i < joint_names.size(); ++i) {
