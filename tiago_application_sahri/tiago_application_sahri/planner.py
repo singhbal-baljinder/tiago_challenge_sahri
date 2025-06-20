@@ -83,8 +83,6 @@ class PickPlace(Node):
         self.pose_pub = self.create_publisher(Pose,   '/target_pose',  10)
         self.grip_pub = self.create_publisher(String, '/gripper_cmd',  10)
 
-        self.follow = False  # bloc attaché virtuellement ?
-
         # (pose | None, 'OPEN'/'CLOSE', durée en secondes)
         self.seq = [
             # 1. Dégagement / montée sécurité
@@ -148,15 +146,11 @@ class PickPlace(Node):
         # ➜ Maintien gripper cmd à chaque tick
         self.grip_pub.publish(String(data=cmd))
 
-        # Premier tick logique + follow switch
+        # Premier tick logique
         if self.tick_in_step == 0:
             self.ticks_needed = int(duration * FREQ_HZ)
             self.get_logger().info(
                 f"Étape {self.step_idx+1}/{len(self.seq)} — {cmd} ({duration}s)")
-            if cmd == 'CLOSE':
-                self.follow = True
-            elif cmd == 'OPEN':
-                self.follow = False
 
         # Avancement
         self.tick_in_step += 1
