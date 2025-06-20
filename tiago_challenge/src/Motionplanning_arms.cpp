@@ -5,7 +5,8 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 
-#include "std_msgs/msg/string.hpp"
+#include <std_msgs/msg/string.hpp>
+#include <std_msgs/msg/bool.hpp>
 
 #include "Motionplanning_arms.hpp"
 #include "RobotTaskStatus.hpp"
@@ -205,22 +206,32 @@ void icr_Motionplanning_arms::SendGripperAction(
   auto send_goal_options =
     rclcpp_action::Client<control_msgs::action::FollowJointTrajectory>::SendGoalOptions();
 
+
+  
   send_goal_options.result_callback =
     [this](const GoalHandleFollowJointTrajectory::WrappedResult & result) {
+      std_msgs::msg::Bool msg;
+      // Publisher for gripper result (true if succeeded, false otherwise)
+      static auto gripper_result_pub = this->create_publisher<std_msgs::msg::Bool>("gripper_action_result", 10);
       switch (result.code) {
         case rclcpp_action::ResultCode::SUCCEEDED:
           RCLCPP_INFO(this->get_logger(), "Gripper action succeeded");
+          msg.data = true;
           break;
         case rclcpp_action::ResultCode::ABORTED:
           RCLCPP_ERROR(this->get_logger(), "Gripper action aborted");
+          msg.data = false;
           break;
         case rclcpp_action::ResultCode::CANCELED:
           RCLCPP_ERROR(this->get_logger(), "Gripper action canceled");
+          msg.data = false;
           break;
         default:
           RCLCPP_ERROR(this->get_logger(), "Unknown result code");
+          msg.data = false;
           break;
       }
+      gripper_result_pub->publish(msg);
     };
 
   auto goal_handle_future = client->async_send_goal(goal, send_goal_options);
@@ -306,7 +317,7 @@ int icr_Motionplanning_arms::ArmMotionPlanning(RobotTaskStatus action_to_do)
   return EXIT_SUCCESS;
 }
 
-void icr_Motionplanning_arms::motion_planning_control(
+bool icr_Motionplanning_arms::motion_planning_control(
   const geometry_msgs::msg::Pose & goal,
   RobotTaskStatus::Arm motion_type)
 {
@@ -318,7 +329,7 @@ void icr_Motionplanning_arms::motion_planning_control(
     moveit_group_selection = "arm_torso";  // adjust to your setup
   } else {
     RCLCPP_ERROR(this->get_logger(), "Invalid motion type for planning");
-    return;
+    return false;
   }
 
   const std::string end_effector_link = "arm_tool_link";   // adjust to your arm's tool link
@@ -347,8 +358,13 @@ void icr_Motionplanning_arms::motion_planning_control(
   moveit::planning_interface::MoveItErrorCode success = group_arm.move();
 
   if (!success) {
-    throw std::runtime_error("Error executing motion planning");
+    RCLCPP_ERROR(this->get_logger(), "Error executing motion planning");
+    // Optionally throw, or just return false
+    // throw std::runtime_error("Error executing motion planning");
+    return false;
   }
+  // Return true if planning was successful
+  return true;
 }
 
 moveit_msgs::msg::PlanningScene icr_Motionplanning_arms::Add_Obstacle(

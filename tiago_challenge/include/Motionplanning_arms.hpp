@@ -15,6 +15,7 @@
 
 #include "std_msgs/msg/string.hpp"
 
+
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <play_motion2_msgs/action/play_motion2.hpp>
 #include <control_msgs/action/point_head.hpp>
@@ -96,7 +97,7 @@ public:
   void  Stable_Pose(int motion_type);
 
 
-  void motion_planning_control(
+  bool motion_planning_control(
     const geometry_msgs::msg::Pose & goal,
     RobotTaskStatus::Arm motion_type);
 
