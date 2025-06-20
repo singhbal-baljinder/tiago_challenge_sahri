@@ -153,9 +153,9 @@
         </link>
       </model>
       <model name='kitchen_table'>
-        <pose>0.847429 -0.69646 0 0 -0 0</pose>
+        <pose>0.547429 -0.69646 0 0 -0 0</pose>
         <link name='link'>
-          <pose>0.847429 -0.69646 0 0 -0 0</pose>
+          <pose>0.547429 -0.69646 0 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -170,7 +170,7 @@
     </gui>
     <model name="jenga_block">
       <!-- place the whole model 1 m in front of the robot and 1.5 m high -->
-      <pose>1 0 1.5 0 0 0</pose>
+      <pose>0.7 0 1.5 0 0 0</pose>
 
       <link name="link">
         <pose>0 0 0 0 0 0</pose>
@@ -186,8 +186,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
               </ode>
             </friction>
           </surface>
