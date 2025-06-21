@@ -82,7 +82,7 @@ public:
     moveit_msgs::msg::PlanningScene planning_scene_msg =
       node_->Add_Obstacle(obstacle_pose, "Table");
 
-    //planning_scene_publisher_->publish(planning_scene_msg);
+    planning_scene_publisher_->publish(planning_scene_msg);
 
     // Publish move_finished status
     std_msgs::msg::Bool move_finished_msg;
