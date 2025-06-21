@@ -29,6 +29,7 @@
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
+from abc import update_abstractmethods
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Pose
@@ -91,6 +92,7 @@ def make_pose(x: float, y: float, z: float, q_x: float, q_y: float, q_z:float, q
     return p
 
 
+
 class PickPlace(Node):
     """Node ROS 2 qui publie la trajectoire pick‑and‑place + suivi bloc."""
 
@@ -100,6 +102,10 @@ class PickPlace(Node):
         # Publishers
         self.pose_pub = self.create_publisher(Pose,   '/target_pose',  10)
         self.grip_pub = self.create_publisher(String, '/gripper_cmd',  10)
+
+        self.number_layer = 0
+        self.max_layer = 15
+        self.layer_hight = BLOCK_H
 
         # (pose | None, 'OPEN'/'CLOSE', durée en secondes)
         self.seq = [
@@ -157,12 +163,56 @@ class PickPlace(Node):
         self.get_logger().info('Pick-and-place v10 lancé ✔ (suivi SetEntityState)')
         self.create_timer(1.0 / FREQ_HZ, self.timer_cb)
 
+
+    def update_seqposes(self, layerheight=0.0 ):
+      self.seq = [
+          # 1. Dégagement / montée sécurité
+      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+
+      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
+      (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
+      (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+
+      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+
+      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
+      (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
+      (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+
+
+      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+
+      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
+      (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
+      (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+
+
+      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+
+
+      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
+      (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
+      (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+
+      ]
+
     # ------------------------------------------------------------------
     # Timer principal
     # ------------------------------------------------------------------
     def timer_cb(self):
-        if self.step_idx >= len(self.seq):
+        if self.step_idx >= len(self.seq) and self.number_layer <= self.max_layers:
+            self.update_seqposes(self.layer_hight)
+            self.number_layer += 1
             self.get_logger().info('Séquence terminée ✅')
+            self.seq
             rclpy.shutdown()
             return
 

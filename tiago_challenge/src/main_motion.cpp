@@ -74,7 +74,7 @@ public:
     obstacle_pose.header.frame_id = "base_footprint";
     obstacle_pose.pose.position.x = 0.90;
     obstacle_pose.pose.position.y = 0.0;
-    obstacle_pose.pose.position.z = msg->position.z -safety_distance; 
+    obstacle_pose.pose.position.z = msg->position.z + safety_distance;
     obstacle_pose.pose.orientation.x = 0.0;
     obstacle_pose.pose.orientation.y = 0.0;
     obstacle_pose.pose.orientation.z = 0.0;
