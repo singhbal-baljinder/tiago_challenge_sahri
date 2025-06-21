@@ -41,12 +41,10 @@ from gazebo_msgs.msg import EntityState
 # ---------------------------------------------------------------------------
 # Paramètres scène
 # ---------------------------------------------------------------------------
-TABLE_Z   = 0.7             # hauteur table (surface) + marge
+TABLE_Z   = 0.53 + 0.27             # hauteur table (surface) + marge
 BLOCK_H   = 0.015                  # épaisseur du bloc
 JENGA_LENGHT = 0.075                  # longueur bloc Jenga
 JENGA_WIDTH = 0.03                   # largeur bloc Jenga
-CENTER_Z  = TABLE_Z + BLOCK_H / 2.0      # 0.6875 m
-SAFE_Z    = 1.05                        # zone sûre bien au-dessus
 HOME_Z    = TABLE_Z + 0.2                        # home très haut
 
 # Waypoints
@@ -106,44 +104,44 @@ class PickPlace(Node):
         self.number_layer = 0
         self.max_layer = 15
         self.layer_hight = BLOCK_H
-
+        duration = 1.0
         # (pose | None, 'OPEN'/'CLOSE', durée en secondes)
         self.seq = [
             # 1. Dégagement / montée sécurité
-        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
-        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
-        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', duration),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', duration),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', duration),
 
-        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
-        (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
-        (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', duration),
+        (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', duration),
+        (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', duration),
 
-        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
-        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
-        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', duration),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', duration),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', duration),
 
-        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
-        (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
-        (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
-
-
-        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
-        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
-        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
-
-        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
-        (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
-        (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', duration),
+        (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', duration),
+        (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', duration),
 
 
-        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
-        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
-        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', duration),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', duration),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', duration),
+
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', duration),
+        (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', duration),
+        (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', duration),
 
 
-        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
-        (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
-        (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', duration),
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', duration),
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', duration),
+
+
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', duration),
+        (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', duration),
+        (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', duration),
 
         ]
         # Print the sequnce for debugging
@@ -164,43 +162,30 @@ class PickPlace(Node):
         self.create_timer(1.0 / FREQ_HZ, self.timer_cb)
 
 
-    def update_seqposes(self, layerheight=0.0 ):
+    def update_seqposes(self, layerheight=0.0, duration=1.0):
       self.seq = [
           # 1. Dégagement / montée sécurité
-      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
-      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
-      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', duration),
+      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', duration),
+      (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', duration),
+      (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', duration),
 
-      (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
-      (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
-      (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
-
-      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
-      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
-      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
-
-      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
-      (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
-      (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', duration),
+      (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', duration),
+      (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', duration),
+      (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', duration),
 
 
-      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
-      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
-      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
-
-      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
-      (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
-      (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', duration),
+      (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', duration),
+      (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', duration),
+      (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2] + layerheight, orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', duration),
 
 
-      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
-      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
-      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
-
-
-      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
-      (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
-      (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', duration),
+      (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', duration),
+      (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', duration),
+      (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2] + layerheight, orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', duration),
 
       ]
 
@@ -212,6 +197,7 @@ class PickPlace(Node):
     def timer_cb(self):
         if self.step_idx >= len(self.seq) and self.number_layer <= self.max_layers:
             self.seq = self.update_seqposes(self.layer_hight)
+            HOME_Z = HOME_Z + self.layer_hight
             self.number_layer += 1
             rclpy.shutdown()
             return
