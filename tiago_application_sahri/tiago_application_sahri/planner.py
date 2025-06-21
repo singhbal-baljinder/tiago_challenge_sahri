@@ -195,7 +195,7 @@ class PickPlace(Node):
     # Timer principal
     # ------------------------------------------------------------------
     def timer_cb(self):
-        if self.step_idx >= len(self.seq) and self.number_layer <= self.max_layers:
+        if self.step_idx >= int(len(self.seq)/2) and self.number_layer <= self.max_layer:
             self.seq = self.update_seqposes(self.layer_hight)
             HOME_Z = HOME_Z + self.layer_hight
             self.number_layer += 1
