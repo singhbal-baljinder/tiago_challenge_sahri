@@ -42,15 +42,26 @@ from gazebo_msgs.msg import EntityState
 # ---------------------------------------------------------------------------
 TABLE_Z   = 0.53 + 0.27            # hauteur table (surface) + marge
 BLOCK_H   = 0.015                  # épaisseur du bloc
+JENGA_LENGHT = 0.075                  # longueur bloc Jenga
+JENGA_WIDTH = 0.03                   # largeur bloc Jenga
 CENTER_Z  = TABLE_Z + BLOCK_H / 2.0      # 0.6875 m
 SAFE_Z    = 1.05                        # zone sûre bien au-dessus
-HOME_Z    = 1.20                        # home très haut
+HOME_Z    = TABLE_Z + 0.2                        # home très haut
 
 # Waypoints
-SIDE_XY       = (0.20, -0.35)           # déport latéral
-PICK_XY       = (0.70, 0.00)            # prise
-GRIP_MOVE_XY  = (0.70, 0.30)            # translation bloc fermé
-PLACE_XY      = (0.70, 0.15)            # pose finale
+CENTER_TOWER = (0.70, 0.00, TABLE_Z)  # centre du bloc Jenga
+orientation_0 = (0.0, 0.7071068, 0.0, 0.7071068)  # orientation pince vers le bas
+# Orientation b is 90 degrees rotated wrt z
+orientation_90 = orientation_0  # orientation pince vers le bas, 90° sur x
+pose_1_a       = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_1_b      = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] )  # pose bloc au-dessus du centre
+pose_2_a       = (CENTER_TOWER[0] - JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_2_b      = (CENTER_TOWER[0] - JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] )  # pose bloc au-dessus du centre
+pose_3_a = (CENTER_TOWER[0], CENTER_TOWER[1] - JENGA_WIDTH/2, CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_3_b = (CENTER_TOWER[0], CENTER_TOWER[1] - JENGA_WIDTH/2, CENTER_TOWER[2] )  # pose bloc au-dessus du centre
+pose_4_a = (CENTER_TOWER[0], CENTER_TOWER[1] + JENGA_WIDTH/2, CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_4_b = (CENTER_TOWER[0], CENTER_TOWER[1] + JENGA_WIDTH/2, CENTER_TOWER[2] )  # pose bloc au-dessus du centre
+
 
 FREQ_HZ   = 10                          # fréquence timer
 WAIT_AFTER_STEP_SECS = 1.0              # pause 1 s entre étapes
@@ -61,15 +72,20 @@ Q_DOWN_X_POS90    = (0.5000000,  0.5000000, -0.5000000,  0.5000000)
 Q_DOWN_X_NEG90    = (-0.5000000,  0.5000000,  0.5000000,  0.5000000)
 Q_ROLL            = Q_DOWN_X_NEG90   # garde la pince vers le bas chez TIAGo
 
+
+
 # Bloc à suivre
 BLOCK_NAME      = 'jenga_block'
 BLOCK_OFFSET    = (0.0, 0.0, -BLOCK_H/2)  # centre bloc ↘ pinces
 # ---------------------------------------------------------------------------
 
-def make_pose(x: float, y: float, z: float, q=Q_DOWN) -> Pose:
+def make_pose(x: float, y: float, z: float, q_x, q_y: float, q_z:float, q_w:float) -> Pose:
     p = Pose()
     p.position.x, p.position.y, p.position.z = x, y, z
-    p.orientation.x, p.orientation.y, p.orientation.z, p.orientation.w = q
+    p.orientation.x = q_x
+    p.orientation.y= q_y
+    p.orientation.z = q_z
+    p.orientation.w = q_w
     return p
 
 
@@ -86,28 +102,28 @@ class PickPlace(Node):
         # (pose | None, 'OPEN'/'CLOSE', durée en secondes)
         self.seq = [
             # 1. Dégagement / montée sécurité
-            (make_pose(*SIDE_XY, SAFE_Z),                     'OPEN', 3),
-            (make_pose(*SIDE_XY, HOME_Z),                     'OPEN', 2),
-            (make_pose(0.40, 0.00, HOME_Z),                   'OPEN', 2),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
+        (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
+        (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
 
-            # 2. Approche pick (roll X)
-            (make_pose(*PICK_XY, SAFE_Z),                     'OPEN', 3),
-            (make_pose(*PICK_XY, SAFE_Z, Q_ROLL),             'OPEN', 1),
-            (make_pose(*PICK_XY, CENTER_Z, Q_ROLL),           'OPEN', 2),
-            (None,                                            'CLOSE', 2),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
+        (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
+        (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
 
-            # 3. Translation fermée
-            (make_pose(*PICK_XY, SAFE_Z, Q_ROLL),             'CLOSE', 2),
-            (make_pose(*GRIP_MOVE_XY, SAFE_Z, Q_ROLL),        'CLOSE', 3),
-            # 4. Zone de pose
-            (make_pose(*PLACE_XY, SAFE_Z, Q_ROLL),            'CLOSE', 2),
-            (make_pose(*PLACE_XY, SAFE_Z, Q_DOWN),            'CLOSE', 1),
-            (make_pose(*PLACE_XY, CENTER_Z, Q_DOWN),          'CLOSE', 2),
-            (None,                                            'OPEN', 2),
 
-            # 5. Retour home
-            (make_pose(*PLACE_XY, SAFE_Z),                    'OPEN', 2),
-            (make_pose(0.40, 0.00, HOME_Z),                   'OPEN', 3),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
+        (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
+        (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+
+
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
+        (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
+        (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+
         ]
 
         self.step_idx     = 0

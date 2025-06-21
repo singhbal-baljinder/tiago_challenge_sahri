@@ -55,7 +55,7 @@ public:
   {
     RCLCPP_INFO(node_->get_logger(), "Received target pose from topic.");
     try {
-      move_finished_ = node_->motion_planning_control(*msg, RobotTaskStatus::Arm::ARM);
+      move_finished_ = node_->motion_planning_control(*msg, RobotTaskStatus::Arm::ARM_torso);
       RCLCPP_INFO(node_->get_logger(), "Motion planning succeeded.");
     } catch (const std::exception & e) {
       move_finished_ = false;
@@ -112,7 +112,7 @@ int main(int argc, char ** argv)
   obstacle_pose.header.frame_id = "base_footprint";
   obstacle_pose.pose.position.x = 1.0;
   obstacle_pose.pose.position.y = 1.0;
-  obstacle_pose.pose.position.z = 1.5;
+  obstacle_pose.pose.position.z = 0.53+0.27; // Adjusted height for the table + gripper height
   obstacle_pose.pose.orientation.x = 0.0;
   obstacle_pose.pose.orientation.y = 0.0;
   obstacle_pose.pose.orientation.z = 0.0;
