@@ -61,6 +61,25 @@ public:
       move_finished_ = false;
       RCLCPP_ERROR(node_->get_logger(), "Motion planning failed: %s", e.what());
     }
+    // Publisher for planning scene (if needed)
+    auto planning_scene_publisher_ = node_->create_publisher<moveit_msgs::msg::PlanningScene>(
+      "/planning_scene", rclcpp::QoS(1));
+
+    // Add obstacle (if needed)
+    geometry_msgs::msg::PoseStamped obstacle_pose;
+    obstacle_pose.header.frame_id = "base_footprint";
+    obstacle_pose.pose.position.x = 1.0;
+    obstacle_pose.pose.position.y = 1.0;
+    obstacle_pose.pose.position.z = msg->position.z; 
+    obstacle_pose.pose.orientation.x = 0.0;
+    obstacle_pose.pose.orientation.y = 0.0;
+    obstacle_pose.pose.orientation.z = 0.0;
+    obstacle_pose.pose.orientation.w = 1.0;
+    moveit_msgs::msg::PlanningScene planning_scene_msg =
+      node_->Add_Obstacle(obstacle_pose, "Table");
+
+    planning_scene_publisher_->publish(planning_scene_msg);
+
     // Publish move_finished status
     std_msgs::msg::Bool move_finished_msg;
     move_finished_msg.data = move_finished_;
@@ -103,24 +122,6 @@ int main(int argc, char ** argv)
     RCLCPP_ERROR(node->get_logger(), "Exception in TorsoControl: %s ", e.what());
   }
 
-  // Publisher for planning scene (if needed)
-  auto planning_scene_publisher_ = node->create_publisher<moveit_msgs::msg::PlanningScene>(
-    "/planning_scene", rclcpp::QoS(1));
-
-  // Add obstacle (if needed)
-  geometry_msgs::msg::PoseStamped obstacle_pose;
-  obstacle_pose.header.frame_id = "base_footprint";
-  obstacle_pose.pose.position.x = 1.0;
-  obstacle_pose.pose.position.y = 1.0;
-  obstacle_pose.pose.position.z = 0.53+0.27; // Adjusted height for the table + gripper height
-  obstacle_pose.pose.orientation.x = 0.0;
-  obstacle_pose.pose.orientation.y = 0.0;
-  obstacle_pose.pose.orientation.z = 0.0;
-  obstacle_pose.pose.orientation.w = 1.0;
-  moveit_msgs::msg::PlanningScene planning_scene_msg =
-    node->Add_Obstacle(obstacle_pose, "Table");
-
-  planning_scene_publisher_->publish(planning_scene_msg);
 
   // Use MotionCallbacks to handle subscriptions and callbacks
   auto motion_callbacks = std::make_shared<MotionCallbacks>(node, node);

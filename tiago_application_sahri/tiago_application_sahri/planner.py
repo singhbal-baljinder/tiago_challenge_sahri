@@ -52,7 +52,7 @@ HOME_Z    = TABLE_Z + 0.2                        # home très haut
 CENTER_TOWER = (0.70, 0.00, TABLE_Z)  # centre du bloc Jenga
 orientation_0 = (0.0, 0.7071068, 0.0, 0.7071068)  # orientation pince vers le bas
 # Orientation b is 90 degrees rotated wrt z
-orientation_90 = orientation_0  # orientation pince vers le bas, 90° sur x
+orientation_90 = (0.5000000,  0.5000000, -0.5000000,  0.5000000)  # orientation pince vers le bas, 90° sur x
 pose_1_a       = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
 pose_1_b      = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] )  # pose bloc au-dessus du centre
 pose_2_a       = (CENTER_TOWER[0] - JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
