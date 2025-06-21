@@ -40,7 +40,7 @@ from gazebo_msgs.msg import EntityState
 # ---------------------------------------------------------------------------
 # Paramètres scène
 # ---------------------------------------------------------------------------
-TABLE_Z   = 0.53 + 0.27            # hauteur table (surface) + marge
+TABLE_Z   = 0.7             # hauteur table (surface) + marge
 BLOCK_H   = 0.015                  # épaisseur du bloc
 JENGA_LENGHT = 0.075                  # longueur bloc Jenga
 JENGA_WIDTH = 0.03                   # largeur bloc Jenga
@@ -49,17 +49,17 @@ SAFE_Z    = 1.05                        # zone sûre bien au-dessus
 HOME_Z    = TABLE_Z + 0.2                        # home très haut
 
 # Waypoints
-CENTER_TOWER = (0.70, 0.00, TABLE_Z)  # centre du bloc Jenga
+CENTER_TOWER = (0.50, 0.00, TABLE_Z)  # centre du bloc Jenga
 orientation_0 = (0.0, 0.7071068, 0.0, 0.7071068)  # orientation pince vers le bas
 # Orientation b is 90 degrees rotated wrt z
 orientation_90 = (0.5000000,  0.5000000, -0.5000000,  0.5000000)  # orientation pince vers le bas, 90° sur x
-pose_1_a       = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_1_a       = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], HOME_Z )  # pose bloc au-dessus du centre
 pose_1_b      = (CENTER_TOWER[0] + JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] )  # pose bloc au-dessus du centre
-pose_2_a       = (CENTER_TOWER[0] - JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_2_a       = (CENTER_TOWER[0] - JENGA_WIDTH/2, CENTER_TOWER[1],  HOME_Z )  # pose bloc au-dessus du centre
 pose_2_b      = (CENTER_TOWER[0] - JENGA_WIDTH/2, CENTER_TOWER[1], CENTER_TOWER[2] )  # pose bloc au-dessus du centre
-pose_3_a = (CENTER_TOWER[0], CENTER_TOWER[1] - JENGA_WIDTH/2, CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_3_a = (CENTER_TOWER[0], CENTER_TOWER[1] - JENGA_WIDTH/2,  HOME_Z )  # pose bloc au-dessus du centre
 pose_3_b = (CENTER_TOWER[0], CENTER_TOWER[1] - JENGA_WIDTH/2, CENTER_TOWER[2] )  # pose bloc au-dessus du centre
-pose_4_a = (CENTER_TOWER[0], CENTER_TOWER[1] + JENGA_WIDTH/2, CENTER_TOWER[2] + HOME_Z )  # pose bloc au-dessus du centre
+pose_4_a = (CENTER_TOWER[0], CENTER_TOWER[1] + JENGA_WIDTH/2,  HOME_Z )  # pose bloc au-dessus du centre
 pose_4_b = (CENTER_TOWER[0], CENTER_TOWER[1] + JENGA_WIDTH/2, CENTER_TOWER[2] )  # pose bloc au-dessus du centre
 
 
@@ -140,6 +140,13 @@ class PickPlace(Node):
         (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
 
         ]
+        # Print the sequnce for debugging
+        for i, (pose, cmd, duration) in enumerate(self.seq):
+            if pose is not None:
+                self.get_logger().info(f"Étape {i+1}: Pose({pose.position.x:.3f}, {pose.position.y:.3f}, {pose.position.z:.3f}), "
+                                       f"Cmd: {cmd}, Durée: {duration}s")
+            else:
+                self.get_logger().info(f"Étape {i+1}: Cmd: {cmd}, Durée: {duration}s")
 
         self.step_idx     = 0
         self.tick_in_step = 0
@@ -173,6 +180,9 @@ class PickPlace(Node):
         # Publie la pose cible pour le bras
         if pose is not None:
             self.pose_pub.publish(pose)
+            self.get_logger().info(f"Pose: x={pose.position.x:.3f}, y={pose.position.y:.3f}, z={pose.position.z:.3f}, "
+                                   f"qx={pose.orientation.x:.3f}, qy={pose.orientation.y:.3f}, "
+                                   f"qz={pose.orientation.z:.3f}, qw={pose.orientation.w:.3f}")
 
         # ➜ Maintien gripper cmd à chaque tick
         self.grip_pub.publish(String(data=cmd))

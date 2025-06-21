@@ -57,6 +57,9 @@ public:
     try {
       move_finished_ = node_->motion_planning_control(*msg, RobotTaskStatus::Arm::ARM_torso);
       RCLCPP_INFO(node_->get_logger(), "Motion planning succeeded.");
+      RCLCPP_INFO(node_->get_logger(), "Target pose: [x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f]",
+          msg->position.x, msg->position.y, msg->position.z,
+          msg->orientation.x, msg->orientation.y, msg->orientation.z, msg->orientation.w);
     } catch (const std::exception & e) {
       move_finished_ = false;
       RCLCPP_ERROR(node_->get_logger(), "Motion planning failed: %s", e.what());
@@ -65,12 +68,13 @@ public:
     auto planning_scene_publisher_ = node_->create_publisher<moveit_msgs::msg::PlanningScene>(
       "/planning_scene", rclcpp::QoS(1));
 
+    double safety_distance = 0.01; // Example safety distance, adjust as needed
     // Add obstacle (if needed)
     geometry_msgs::msg::PoseStamped obstacle_pose;
     obstacle_pose.header.frame_id = "base_footprint";
-    obstacle_pose.pose.position.x = 1.0;
-    obstacle_pose.pose.position.y = 1.0;
-    obstacle_pose.pose.position.z = msg->position.z; 
+    obstacle_pose.pose.position.x = 0.90;
+    obstacle_pose.pose.position.y = 0.0;
+    obstacle_pose.pose.position.z = msg->position.z -safety_distance; 
     obstacle_pose.pose.orientation.x = 0.0;
     obstacle_pose.pose.orientation.y = 0.0;
     obstacle_pose.pose.orientation.z = 0.0;
@@ -78,7 +82,7 @@ public:
     moveit_msgs::msg::PlanningScene planning_scene_msg =
       node_->Add_Obstacle(obstacle_pose, "Table");
 
-    planning_scene_publisher_->publish(planning_scene_msg);
+    //planning_scene_publisher_->publish(planning_scene_msg);
 
     // Publish move_finished status
     std_msgs::msg::Bool move_finished_msg;
