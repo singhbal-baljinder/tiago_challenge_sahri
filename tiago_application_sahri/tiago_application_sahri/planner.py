@@ -79,11 +79,13 @@ BLOCK_NAME      = 'jenga_block'
 BLOCK_OFFSET    = (0.0, 0.0, -BLOCK_H/2)  # centre bloc ↘ pinces
 # ---------------------------------------------------------------------------
 
-def make_pose(x: float, y: float, z: float, q_x, q_y: float, q_z:float, q_w:float) -> Pose:
+def make_pose(x: float, y: float, z: float, q_x: float, q_y: float, q_z:float, q_w:float) -> Pose:
     p = Pose()
-    p.position.x, p.position.y, p.position.z = x, y, z
+    p.position.x = x
+    p.position.y = y
+    p.position.z = z
     p.orientation.x = q_x
-    p.orientation.y= q_y
+    p.orientation.y = q_y
     p.orientation.z = q_z
     p.orientation.w = q_w
     return p
@@ -103,23 +105,36 @@ class PickPlace(Node):
         self.seq = [
             # 1. Dégagement / montée sécurité
         (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+        (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
+
         (make_pose(pose_1_a[0],pose_1_a[1],pose_1_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
         (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'CLOSE', 5),
         (make_pose(pose_1_b[0],pose_1_b[1],pose_1_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]), 'OPEN', 5),
 
         (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+        (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
+
         (make_pose(pose_2_a[0],pose_2_a[1],pose_2_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
         (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'CLOSE', 5),
         (make_pose(pose_2_b[0],pose_2_b[1],pose_2_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]), 'OPEN', 5),
 
 
         (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+        (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
+
         (make_pose(pose_3_a[0],pose_3_a[1],pose_3_a[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
         (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'CLOSE', 5),
         (make_pose(pose_3_b[0],pose_3_b[1],pose_3_b[2], orientation_0[0], orientation_0[1], orientation_0[2], orientation_0[3]),'OPEN', 5),
 
 
         (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+        (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
+
+
         (make_pose(pose_4_a[0],pose_4_a[1],pose_4_a[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
         (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'CLOSE', 5),
         (make_pose(pose_4_b[0],pose_4_b[1],pose_4_b[2], orientation_90[0], orientation_90[1], orientation_90[2], orientation_90[3]),'OPEN', 5),
